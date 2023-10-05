@@ -5,11 +5,13 @@ class Product {
     private String name;
     private double price;
     private boolean available;
+    private double discount; // New field for discount percentage
 
-    public Product(String name, double price, boolean available) {
+    public Product(String name, double price, boolean available, double discount) {
         this.name = name;
         this.price = price;
         this.available = available;
+        this.discount = discount;
     }
 
     public String getName() {
@@ -17,11 +19,24 @@ class Product {
     }
 
     public double getPrice() {
-        return price;
+        // Apply the discount to the price if the product is available
+        if (available) {
+            return price * (1 - discount / 100.0); // Convert discount percentage to a fraction
+        } else {
+            return 0; // Product not available, no price
+        }
     }
 
     public boolean isAvailable() {
         return available;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
     }
 }
 
@@ -45,8 +60,9 @@ class CartItem {
     public int getQuantity() {
         return quantity;
     }
-    public int getaddQuantity(){
-        return quantity+=quantity;
+
+    public int getAddQuantity() {
+        return quantity += quantity;
     }
 }
 
@@ -64,8 +80,8 @@ class ShoppingCart {
         if (product != null) {
             CartItem existingCartItem = findCartItemByName(productName);
             if (existingCartItem != null) {
-                existingCartItem.getaddQuantity() ;
-               
+                existingCartItem.getAddQuantity();
+
             } else {
                 cart.add(new CartItem(product, quantity));
             }
@@ -87,11 +103,10 @@ class ShoppingCart {
 
     public void viewCart() {
         System.out.println("Cart Items:");
-        
+
         for (CartItem cartItem : cart) {
             System.out.println(cartItem.getProduct().getName() + " x" + cartItem.getQuantity());
         }
-        
     }
 
     public double calculateTotalBill() {
@@ -124,26 +139,23 @@ class ShoppingCart {
 public class E_commerce_cart {
     public static void main(String[] args) {
         ArrayList<Product> products = new ArrayList<>();
-        products.add(new Product("Laptop", 10000, true));
-        products.add(new Product("Headphones", 50, true));
-        products.add(new Product("SmartPhone", 3000, true));
-        
+        products.add(new Product("Laptop", 10000, true, 25));
+        products.add(new Product("Headphones", 50, true, 10));
+        products.add(new Product("SmartPhone", 3000, true, 20));
 
         ShoppingCart cart = new ShoppingCart(products);
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Welcome to the E-commerce Cart System!");
-        System.out.println("[{ Name:Laptop     , Price:10000 , Available:true}");
-        System.out.println("{  Name:Headphones , Price:50    , Available:true}");
-        System.out.println("{  Name:SmartPhone , Price:3000  , Available:true}]");
+        System.out.println("[{ Name:Laptop     , Price:10000 , Available:true, Discount: 10%}");
+        System.out.println("{  Name:Headphones , Price:50    , Available:true, Discount: 20%}");
+        System.out.println("{  Name:SmartPhone , Price:3000  , Available:true, Discount: 15%}]");
 
         while (true) {
-
-            
             System.out.println();
             System.out.println(" -Add item in cart");
             System.out.println(" -Remove items in cart ");
-            System.out.println(" -View cartitems");
+            System.out.println(" -View cart items");
             System.out.println(" -Checkout ");
             System.out.println(" -Exit ");
             System.out.println();
@@ -154,7 +166,7 @@ public class E_commerce_cart {
                 promptAddProduct(cart, scanner);
             } else if (action.equals("Remove items in cart")) {
                 promptRemoveProduct(cart, scanner);
-            } else if (action.equals("View cartitems")) {
+            } else if (action.equals("View cart items")) {
                 cart.viewCart();
             } else if (action.equals("Checkout")) {
                 double totalBill = cart.calculateTotalBill();
@@ -163,9 +175,8 @@ public class E_commerce_cart {
                 break;
             } else {
                 System.out.println();
-                System.out.println("Invalid action. Please enter :");
+                System.out.println("Invalid action. Please enter:");
                 System.out.println();
-                
             }
         }
 
@@ -178,7 +189,7 @@ public class E_commerce_cart {
 
         System.out.print("Enter quantity: ");
         int quantity = scanner.nextInt();
-        scanner.nextLine(); 
+        scanner.nextLine();
 
         cart.addProduct(productName, quantity);
     }
